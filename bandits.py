@@ -32,10 +32,9 @@ class EGreedyMAB:
 
 
 class BetaBandit(object):
-    def __init__(self, num_options=2, prior =(.5, .5)):
+    def __init__(self, prior =(.5, .5)):
         self.arm_plays = {}
         self.successes = {}
-        self.num_options = num_options
         self.prior = prior
     
     def update(self, arm_id, success):

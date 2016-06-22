@@ -9,7 +9,7 @@ import sys
 # Scales the arm_probs to all be between 0 and 1.
 # The highest pre-scaled value is assigned a value of 1.
 # Probs is a dictionary
-def scale(probs, lower_bound, upper_bound):
+def _scale(probs, lower_bound, upper_bound):
     # min_int
     biggest = - sys.maxint - 1
     interval = upper_bound - lower_bound
@@ -31,12 +31,11 @@ class SimpleSimulator:
         temp_val_list = []
         scaled_vals = []
         for i in range(0, n_arms):
-            temp_val = np.random.normal(loc=loc_value, scale = scale_value)
+            temp_val = np.random.normal(loc=loc_value, scale = scale_value) 
             temp_val_list.append(temp_val)
-        scaled_vals = scale(temp_val_list, lower_bound=0, upper_bound=.2)
+        scaled_vals = _scale(temp_val_list, lower_bound=0, upper_bound=.2)
         for i in range(0,n_arms):
-            self.arm_probs[i] = scaled_vals[i]
-    
+            self.arm_probs[i] = scaled_vals[i] 
     def get_available_arms(self):
         return self.arm_probs.keys(), []
     
