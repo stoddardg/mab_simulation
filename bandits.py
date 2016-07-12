@@ -64,9 +64,9 @@ class UCB():
 		return max(ucb_values, key=ucb_values.get)
 	
 	def update(self, arm_id, reward_list):
-			self.total_plays += 1
+			self.total_plays += 1.0*len(reward_list)
 			self.arm_plays[arm_id] = 1.0*len(reward_list) + self.arm_plays.get(arm_id,0)
-			self.arm_rewards[arm_id] = reward + self.arm_rewards.get(arm_id, 0)
+			self.arm_rewards[arm_id] = 1.0*(np.sum(reward_list)) + self.arm_rewards.get(arm_id, 0)
 
 
 	
