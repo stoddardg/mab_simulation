@@ -11,6 +11,8 @@ def evaluate_bandit(sim, mab, time_steps):
         arm_play_counter[arm_to_play] += 1.0
 #         played[i][arm_to_play] += 1
         
+        # reward is itself a list of successes and failures drawn 
+        # from a Bernouilli distribution
         reward = sim.get_reward(arm_to_play)
         mab.update(arm_to_play, reward)
         reward_list.append(reward*1.0)
