@@ -39,10 +39,8 @@ class BetaBandit(object):
 	def update(self, arm_id, reward_list):
 
 		self.arm_plays[arm_id] = self.arm_plays.get(arm_id, 0) + 1.0*(len(reward_list))
-		for trial in reward_list:
-			# if the trial was a success
-			if trial == 1:
-				self.successes[arm_id] = self.successes.get(arm_id, 0)+1.0*(len(reward_list))
+
+		self.successes[arm_id] = self.successes.get(arm_id, 0)+1.0*(np.sum(reward_list))
 	 
 	def get_decision(self,arm_id_list,arm_feature_list):
 		sampled_theta = []
