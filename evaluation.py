@@ -13,7 +13,7 @@ def evaluate_bandit(sim, mab, time_steps, plays_per_time_step):
         # reward is itself a list of successes and failures drawn 
         # from a Bernouilli distribution
         reward = sim.get_reward(arm_to_play, n_pulls = plays_per_time_step)
-        mab.update(arm_to_play, reward)
+        mab.update(arm_to_play,sim.get_arm_features(arm_to_play), reward)
         reward_list.append(np.sum(reward)*1.0)
     
     total_reward = np.sum(reward_list)

@@ -42,3 +42,5 @@ class SimpleSimulator:
     def get_reward(self, arm_id):
         return scipy.stats.bernoulli.rvs(self.arm_probs.get(arm_id,0))
     
+    def get_arm_features(self, arm_id):
+        return []
