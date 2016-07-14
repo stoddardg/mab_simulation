@@ -1,7 +1,7 @@
 import numpy as np
 
 from collections import Counter
-def evaluate_bandit(sim, mab, time_steps):
+def evaluate_bandit(sim, mab, time_steps, plays_per_time_step):
     reward_list = []
     arm_play_counter = Counter() 
     for t in np.arange(time_steps):
@@ -12,9 +12,9 @@ def evaluate_bandit(sim, mab, time_steps):
         
         # reward is itself a list of successes and failures drawn 
         # from a Bernouilli distribution
-        reward = sim.get_reward(arm_to_play)
+        reward = sim.get_reward(arm_to_play, n_pulls = plays_per_time_step)
         mab.update(arm_to_play, reward)
-        reward_list.append(reward*1.0)
+        reward_list.append(np.sum(reward)*1.0)
     
     total_reward = np.sum(reward_list)
     average_reward_by_time = np.cumsum(reward_list)/np.arange(1,time_steps+1.0)
