@@ -25,17 +25,19 @@ def _scale(probs, lower_bound, upper_bound):
     
 
 class SimpleSimulator:
-    
-    def __init__(self,n_arms,loc_value, scale_value):
+    def __init__(self, n_arms, loc_value, scale_value):
         self.arm_probs = {}
+        self.arm_features = []
         temp_val_list = []
         scaled_vals = []
+
         for i in range(0, n_arms):
             temp_val = np.random.normal(loc=loc_value, scale = scale_value) 
             temp_val_list.append(temp_val)
         scaled_vals = _scale(temp_val_list, lower_bound=0, upper_bound=.2)
         for i in range(0,n_arms):
             self.arm_probs[i] = scaled_vals[i] 
+
     def get_available_arms(self):
         return self.arm_probs.keys(), []
     
@@ -43,4 +45,11 @@ class SimpleSimulator:
         return scipy.stats.bernoulli.rvs(self.arm_probs.get(arm_id,0))
     
     def get_arm_features(self, arm_id):
-        return []
+        return self.arm_features
+
+    def exists():
+        print "exists"
+
+
+
+
