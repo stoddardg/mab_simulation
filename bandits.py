@@ -29,7 +29,7 @@ class EGreedyMAB:
 		self.arm_mean_payoff[arm_id] = self.arm_feedback[arm_id]/self.arm_plays[arm_id]
 
 
-class BetaBandit(object):
+class BetaBandit:
     def __init__(self, num_options=2, prior =(.5, .5)):
         self.arm_plays = {}
         self.successes = {}
@@ -53,7 +53,7 @@ class BetaBandit(object):
         return arm_id_list[np.argmax(sampled_theta_list)]
 
 
-class UCB():
+class UCB:
 	def __init__(self):
 		self.arm_plays = {}
 		self.arm_rewards = {}
@@ -71,6 +71,50 @@ class UCB():
 			self.arm_plays[arm_id] = 1.0*len(reward_list) + self.arm_plays.get(arm_id,0)
 			self.arm_rewards[arm_id] = 1.0*(np.sum(reward_list)) + self.arm_rewards.get(arm_id, 0)
 
+
+class EGreedy_Logistic:
+    def __init__(self, clf=None, epsilon=.1):
+        self.is_fit = False
+        if clf is None:
+            self.clf = linear_model.SGDClassifier(loss='log',alpha=.000001)
+        else:
+            self.clf = clone(clf)
+    
+    def update(self, arm_id, arm_features, rewards):
+        # For now, we will ignore arm_id because its a pain in the ass
+        X_train = np.tile(arm_features, [len(rewards),1])
+        self.clf.partial_fit(X_train, rewards, classes=[0,1])
+        self.is_fit = True
+
+    ## Assuming that the data is in the same format as the training data
+    def get_decision(self, arm_id_list, arm_feature_list):
+        if self.is_fit == False:
+            return np.random.choice(arm_id_list)
+        if np.random.rand() < epsilon:
+            return np.random.choice(arm_id_list)
+        probs =  [x[1] for x in self.clf.predict_proba(arm_feature_list)]
+        return arm_id_list[np.argmax(probs)]            
+
+class Logistic_Recommender:
+    def __init__(self, clf=None):
+        self.is_fit = False
+        if clf is None:
+            self.clf = linear_model.SGDClassifier(loss='log',alpha=.000001)
+        else:
+            self.clf = clone(clf)
+    
+    def update(self, arm_id, arm_features, rewards):
+        # For now, we will ignore arm_id because its a pain in the ass
+        X_train = np.tile(arm_features, [len(rewards),1])
+        self.clf.partial_fit(X_train, rewards, classes=[0,1])
+        self.is_fit = True
+
+    ## Assuming that the data is in the same format as the training data
+    def get_decision(self, arm_id_list, arm_feature_list):
+        if self.is_fit == False:
+            return np.random.choice(arm_id_list)
+        probs =  [x[1] for x in self.clf.predict_proba(arm_feature_list)]
+        return arm_id_list[np.argmax(probs)]            
 
 	
 		
