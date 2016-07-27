@@ -103,6 +103,7 @@ def hash_features(features, arm_ids, use_id=True):
 
 class EGreedy_Logistic:
     def __init__(self, clf=None,fixed_effects=False, epsilon=0, alpha=.0001):
+        self.arm_plays = {}
         self.alpha = alpha
         self.is_fit = False
         self.fixed_effects = fixed_effects
@@ -125,6 +126,7 @@ class EGreedy_Logistic:
         
         self.clf.partial_fit(X_train, rewards, classes=[0,1])
         self.is_fit = True
+        self.arm_plays[arm_id] = self.arm_plays.get(arm_id,0) + 1.0*len(rewards)
 
     ## Assuming that the data is in the same format as the training data
     def get_decision(self, arm_id_list, arm_feature_list):

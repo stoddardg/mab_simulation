@@ -68,6 +68,15 @@ class DisjointLogisticSimulator:
     def reset(self, random_seed=None):
         self.__init__(len(self.arm_probs), n_features=self.n_features, random_seed=random_seed)
 
+    def remove_arms(self, arm_id_list):
+        for arm_id in arm_id_list:
+            if arm_id in self.arm_probs:
+                del self.arm_probs[arm_id]
+            if arm_id in self.arm_features:
+                del self.arm_features[arm_id]
+            if arm_id in self.arm_betas:
+                del self.arm_betas[arm_id] 
+
 
 class GlobalLogisticSimulator:
     
@@ -99,6 +108,12 @@ class GlobalLogisticSimulator:
         return scipy.stats.bernoulli.rvs(self.arm_probs.get(arm_id,0), size=n_pulls)
     
     def reset(self, random_seed=None):
-        self.__init__(len(self.arm_probs), n_features=self.n_features, random_seed=random_seed
-            )
+        self.__init__(len(self.arm_probs), n_features=self.n_features, random_seed=random_seed)
+
+    def remove_arms(self, arm_id_list):
+        for arm_id in arm_id_list:
+            if arm_id in self.arm_probs:
+                del self.arm_probs[arm_id]
+            if arm_id in self.arm_features:
+                del self.arm_features[arm_id]
 
