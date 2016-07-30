@@ -22,6 +22,8 @@ class EGreedyMAB:
         
         
     def get_decision(self,arm_id_list, arm_feature_list):
+
+
         np.random.shuffle(arm_id_list)
         current_averages = {id: self.arm_mean_payoff.get(id,100) for id in arm_id_list}
         
@@ -34,6 +36,18 @@ class EGreedyMAB:
         self.arm_feedback[arm_id] = self.arm_feedback.get(arm_id,0) + sum(reward_list)
         self.arm_plays[arm_id] = self.arm_plays.get(arm_id,0) + 1.0*(len(reward_list))
         self.arm_mean_payoff[arm_id] = self.arm_feedback[arm_id]/self.arm_plays[arm_id]
+
+    def remove_arms(self, arm_id_list):
+        for arm_id in arm_id_list:
+            if arm_id in self.arm_plays:
+                del self.arm_plays[arm_id]
+            if arm_id in self.arm_feedback:
+                del self.arm_feedback[arm_id]
+            if arm_id in self.arm_mean_payoff:
+                del self.arm_mean_payoff
+
+
+
 
     def reset(self):
         self.__init__(epsilon=self.epsilon)
@@ -61,6 +75,15 @@ class BetaBandit:
         dist = beta(alpha_vals, beta_vals)
         sampled_theta_list = dist.rvs()
         return arm_id_list[np.argmax(sampled_theta_list)]
+
+    def remove_arms(self, arm_id_list):
+        for arm_id in arm_id_list:
+            if arm_id in self.arm_plays:
+                del self.arm_plays[arm_id]
+            if arm_id in self.successes:
+                del self.successes[arm_id]
+
+
 
     def reset(self):
         self.__init__(prior=self.prior)
@@ -114,6 +137,8 @@ class EGreedy_Logistic:
             self.clf = clone(clf)
     
     def update(self, arm_id, arm_features, rewards):
+
+
         # For now, we will ignore arm_id because its a pain in the ass
         X_features = np.tile(arm_features, [len(rewards),1])
 #         X_features = np.tile(1, [len(rewards), 1])
@@ -134,6 +159,7 @@ class EGreedy_Logistic:
             return np.random.choice(arm_id_list)
         if np.random.rand() < self.epsilon:
             return np.random.choice(arm_id_list)
+        # print arm_feature_list
 
         if self.fixed_effects == True:
             X_data = hash_features(arm_feature_list, arm_id_list, use_id=self.fixed_effects)
@@ -142,6 +168,12 @@ class EGreedy_Logistic:
         probs =  [x[1] for x in self.clf.predict_proba(X_data)]
         return arm_id_list[np.argmax(probs)]                
         
+
+    def remove_arms(self, arm_id_list):
+        for arm_id in arm_id_list:
+            if arm_id in self.arm_plays:
+                del self.arm_plays[arm_id]
+
 
     def reset(self):
         self.__init__(epsilon=self.epsilon, fixed_effects=self.fixed_effects, alpha=self.alpha)

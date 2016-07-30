@@ -8,14 +8,20 @@ def eval_bandit(sim, mab, time_steps, plays_per_time_step, TRIALS=1,
     total_avg_reward_list = np.zeros(time_steps)
     total_reward = 0
 
-    arm_play_data = np.zeros(len(sim.arm_probs))
+    n_arms = len(sim.arm_probs)
+
+    if warm_start == True:
+        n_arms -= n_arms_warm_start
+
+    total_arms = len(sim.arm_probs)
+    arm_play_data = np.zeros(n_arms)
 
     for trial in np.arange(TRIALS):
         if random_seed is not None:
             rs = random_seed*trial
         else:
             rs = None
-        sim.reset(random_seed=rs)
+        sim.reset(random_seed=rs, n_arms=total_arms)
         mab.reset()
         reward_list = []
 
@@ -27,12 +33,15 @@ def eval_bandit(sim, mab, time_steps, plays_per_time_step, TRIALS=1,
                 arm_features = sim.get_arm_features(arm)
                 mab.update(arm, arm_features, reward)
             sim.remove_arms(random_arm_list)
-
+            mab.remove_arms(random_arm_list)
 
 
         for t in np.arange(time_steps):
 
             arms, arm_features = sim.get_available_arms()
+
+
+
             arm_to_play = mab.get_decision(arms, arm_features)
             
          
@@ -51,6 +60,9 @@ def eval_bandit(sim, mab, time_steps, plays_per_time_step, TRIALS=1,
         sorted_arm_data = sorted(arm_data, key = lambda x: x[0])
 
         normalized_arm_plays = np.array([x[1] for x in sorted_arm_data]) / (1.0*time_steps*plays_per_time_step)
+
+        # print normalized_arm_plays
+
         arm_play_data += normalized_arm_plays
 
 
