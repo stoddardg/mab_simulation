@@ -2,6 +2,17 @@ import numpy as np
 
 from collections import Counter
 
+import numpy as np
+import scipy.stats
+
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0*np.array(data)
+    n = len(a)
+    m, se = np.mean(a), scipy.stats.sem(a)
+    h = se * scipy.stats.t._ppf((1+confidence)/2., n-1)
+    return m, m-h, m+h
+
+
 def eval_bandit(sim, mab, time_steps, plays_per_time_step, TRIALS=1, 
                 warm_start=False,plays_warm_start=100,n_arms_warm_start=10, random_seed=None):
     
@@ -15,6 +26,8 @@ def eval_bandit(sim, mab, time_steps, plays_per_time_step, TRIALS=1,
 
     total_arms = len(sim.arm_probs)
     arm_play_data = np.zeros(n_arms)
+
+    total_reward_list = []
 
     for trial in np.arange(TRIALS):
         if random_seed is not None:
@@ -71,15 +84,23 @@ def eval_bandit(sim, mab, time_steps, plays_per_time_step, TRIALS=1,
         running_avg_reward /= plays_per_time_step*max(sim.arm_probs.values())
 
         total_avg_reward_list += running_avg_reward
-        total_reward += np.sum(reward_list) / (plays_per_time_step*time_steps*max(sim.arm_probs.values()))
+        
 
-    total_reward /= (1.0*TRIALS)
+
+        total_reward = np.sum(reward_list) / (plays_per_time_step*time_steps*max(sim.arm_probs.values()))
+
+        total_reward_list.append(total_reward)
+
+
+    avg_reward, lower, upper = mean_confidence_interval(total_reward_list)
+
+    # total_reward /= (1.0*TRIALS)
 
     total_avg_reward_list /= (TRIALS)
 
     arm_play_data /= (TRIALS)
 
-    return total_reward, total_avg_reward_list, arm_play_data
+    return avg_reward, (lower, upper),  total_avg_reward_list, arm_play_data
 
 
 
